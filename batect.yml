@@ -1,0 +1,69 @@
+containers:
+  dev-env:
+    image: python:3.7
+    run_as_current_user:
+      enabled: true
+      home_directory: /home/container-user
+    volumes:
+      - local: .
+        container: /src
+        options: cached
+      - local: .pip-cache
+        container: /src/.pip-cache
+        options: cached
+      - local: .pipenv-cache
+        container: /src/.pipenv-cache
+    working_directory: /src
+    environment:
+      PYTHONPATH: "/src"
+      PYTHONUSERBASE: "/src/.pip-cache"
+      PIPENV_VENV_IN_PROJECT: "true"
+    ports:
+      - local: 8000
+        container: 8000
+
+tasks:
+  dep_0:
+    description: Install pipenv
+    group: Dependency tasks
+    run:
+      container: dev-env
+      command: sh -c 'pip install --user pipenv'
+
+  dep_1:
+    description: Install dependencies with pipenv
+    group: Dependency tasks
+    run:
+      container: dev-env
+      command: sh -c 'python -m pipenv install --skip-lock'
+
+  shell:
+    description: Start a shell in the development environment.
+    group: Utility tasks
+    run:
+      container: dev-env
+      command: sh -c '/bin/sh'
+
+  train_model:
+    description: train a random model to be used by the servers, save to model-v0.1.pkl
+    group: Train tasks
+    run:
+      container: dev-env
+      command: python -m pipenv run python our_model.py
+
+  run_nameko:
+    description: takes model, runs the flask app
+    group: Example tasks
+    run:
+      container: dev-env
+      command: python -m pipenv run nameko run nameko_app
+
+  run_falcon:
+    description: takes model, runs the flask app
+    group: Example tasks
+    run:
+      container: dev-env
+      command: python -m pipenv run gunicorn falcon_app:app
+
+
+      #command: sh -c 'pip install --user pipenv; /bin/sh'
