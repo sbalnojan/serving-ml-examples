@@ -1,4 +1,4 @@
 *.pkl
-venv*
+*venv*
 *cache*
 *idea
