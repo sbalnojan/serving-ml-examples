@@ -32,7 +32,10 @@ def load_trained_model():
 def main():
     model = build_model()
     X,y = generate_data()
-    train_save_model(model,X,y, "model-v0.1.pkl")
+
+    PATH="model-v0.1.pkl"
+    train_save_model(model,X,y, PATH)
+    print(f"saved model to {PATH}")
 
 if __name__ == "__main__":
     main()
